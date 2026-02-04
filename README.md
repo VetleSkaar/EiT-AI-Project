@@ -6,7 +6,7 @@ MVP Monorepo for Tender Draft Analysis with AI
 
 This is a full-stack application for analyzing tender drafts using AI/LLM. It consists of:
 
-- **Backend**: FastAPI with SQLite, FAISS vector store, sentence-transformers embeddings, and Ollama LLM integration
+- **Backend**: FastAPI with SQLite, simple vector search, and Ollama LLM integration
 - **Frontend**: Vue 3 + Vite single-page application
 
 ## Features
@@ -14,8 +14,7 @@ This is a full-stack application for analyzing tender drafts using AI/LLM. It co
 ### Backend
 - ✅ RESTful API with FastAPI
 - ✅ SQLite database for drafts and analyses
-- ✅ FAISS vector store for similarity search
-- ✅ Sentence-transformers for embeddings (all-MiniLM-L6-v2)
+- ✅ Simple vector-based similarity search (hash-based embeddings for demo)
 - ✅ Ollama LLM integration (Qwen2.5 / Mistral)
 - ✅ **Mock LLM mode** for testing without Ollama
 - ✅ Auto-detection of Ollama availability
@@ -230,8 +229,7 @@ Frontend:
 - **FastAPI**: Modern, fast web framework
 - **SQLAlchemy**: SQL toolkit and ORM
 - **SQLite**: Lightweight database
-- **FAISS**: Efficient similarity search
-- **sentence-transformers**: State-of-the-art embeddings
+- **NumPy**: Numerical computing (for similarity search)
 - **Ollama**: Local LLM inference
 
 ### Frontend
