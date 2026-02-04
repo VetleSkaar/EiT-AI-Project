@@ -5,8 +5,7 @@ FastAPI backend for analyzing tender drafts using AI.
 ## Features
 
 - SQLite database for storing drafts and analyses
-- Simple vector-based similarity search for finding related tenders
-- Sentence-transformers for embeddings
+- Simple hash-based vector similarity search for finding related tenders
 - Ollama integration for LLM analysis (with mock mode fallback)
 - RESTful API endpoints
 

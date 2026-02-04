@@ -43,7 +43,7 @@ This is a full-stack application for analyzing tender drafts using AI/LLM. It co
 │   │   ├── database.py     # SQLite models
 │   │   ├── models.py       # Pydantic schemas
 │   │   ├── routes.py       # API endpoints
-│   │   ├── vector_store.py # FAISS similarity search
+│   │   ├── vector_store.py # Hash-based similarity search
 │   │   └── llm_service.py  # Ollama LLM integration
 │   ├── requirements.txt
 │   └── README.md

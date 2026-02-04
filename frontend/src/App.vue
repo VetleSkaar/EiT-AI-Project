@@ -41,7 +41,7 @@
 
     <footer>
       <p>
-        MVP Demo | Backend: FastAPI + FAISS + Sentence-Transformers + Ollama (Mock Mode)
+        MVP Demo | Backend: FastAPI + Hash-based Vector Search + Ollama (Mock Mode)
       </p>
     </footer>
   </div>
