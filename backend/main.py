@@ -9,6 +9,7 @@ from pathlib import Path
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
+from app.services.llm import analyze_draft_with_llm, AnalysisResult
 
 load_dotenv()
 
@@ -135,7 +136,7 @@ async def create_draft(draft: DraftCreate):
 
 @app.post("/drafts/{draft_id}/analyze")
 async def analyze_draft(draft_id: int):
-    """Analyze a draft and rank similar notices using TF-IDF cosine similarity"""
+    """Analyze a draft using TF-IDF retrieval and LLM analysis"""
     if draft_id not in drafts_db:
         raise HTTPException(status_code=404, detail="Draft not found")
     
@@ -153,25 +154,70 @@ async def analyze_draft(draft_id: int):
     # Calculate cosine similarity with all notices
     similarities = cosine_similarity(draft_vector, tfidf_matrix)[0]
     
-    # Get top 5 similar notices
-    top_k = 5
+    # Get top 10 similar notices
+    top_k = 10
     top_indices = np.argsort(similarities)[::-1][:top_k]
     
     # Build response with top notices
-    top_notices = []
+    retrieved_notices = []
     for idx in top_indices:
         notice = notices_data[idx].copy()
         notice['similarity_score'] = float(similarities[idx])
-        top_notices.append(notice)
+        
+        # Truncate description_excerpt to max 800 chars
+        if 'description_excerpt' in notice and notice['description_excerpt']:
+            notice['description_excerpt'] = notice['description_excerpt'][:800]
+        
+        retrieved_notices.append(notice)
     
-    # Store analysis result
-    analysis_result = {
+    # Call LLM to generate analysis
+    try:
+        llm_result = await analyze_draft_with_llm(
+            draft_title=draft['title'],
+            draft_description=draft['description'],
+            similar_notices=retrieved_notices,
+            cpv=draft.get('cpv'),
+            ollama_url=os.getenv("OLLAMA_API_URL"),
+            model=os.getenv("OLLAMA_MODEL", "llama3.2")
+        )
+        
+        # Convert the AnalysisResult to dict for storage
+        analysis = llm_result.model_dump()
+        
+    except Exception as e:
+        # If LLM fails, log the error but continue
+        print(f"LLM analysis failed: {e}")
+        # Return a minimal analysis structure
+        analysis = {
+            "error": str(e),
+            "similar_notices_ranked": [],
+            "overlap_summary": "LLM analysis unavailable",
+            "qualitative_analysis": {
+                "risk_management": "Not analyzed",
+                "sustainability_social_values": "Not analyzed",
+                "transparency_fair_competition": "Not analyzed",
+                "innovation_forward_thinking": "Not analyzed"
+            },
+            "recommendation": {
+                "decision": "review_required",
+                "rationale": "LLM analysis failed"
+            },
+            "confidence": 0.0,
+            "caveats": f"Analysis could not be completed: {str(e)}"
+        }
+    
+    # Store the complete result under draft ID
+    analysis_db[draft_id] = {
         "draft_id": draft_id,
-        "top_notices": top_notices
+        "retrieved_notices": retrieved_notices,
+        "analysis": analysis
     }
-    analysis_db[draft_id] = analysis_result
     
-    return {"message": "Analysis complete", "draft_id": draft_id}
+    # Return both retrieved notices and analysis
+    return {
+        "retrieved_notices": retrieved_notices,
+        "analysis": analysis
+    }
 
 
 @app.get("/drafts/{draft_id}/analysis", response_model=Analysis)
