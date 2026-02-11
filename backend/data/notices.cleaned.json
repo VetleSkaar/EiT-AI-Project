@@ -1,0 +1,62 @@
+[
+  {
+    "id": "notice_001",
+    "title": "Construction of new hospital wing",
+    "description": "Tender for construction and development of a modern hospital wing with state-of-the-art medical facilities, including operating rooms, patient wards, and diagnostic equipment areas.",
+    "cpv": "45215140"
+  },
+  {
+    "id": "notice_002",
+    "title": "IT Infrastructure Upgrade",
+    "description": "Supply and installation of network infrastructure, servers, and cloud computing solutions for government offices. Includes data center equipment and networking hardware.",
+    "cpv": "48000000"
+  },
+  {
+    "id": "notice_003",
+    "title": "Road Maintenance Services",
+    "description": "Annual road maintenance contract covering asphalt repair, pothole filling, line marking, and winter maintenance services for municipal roads.",
+    "cpv": "45233142"
+  },
+  {
+    "id": "notice_004",
+    "title": "Medical Equipment Supply",
+    "description": "Procurement of diagnostic medical equipment including MRI machines, CT scanners, ultrasound devices, and laboratory testing equipment for regional hospitals.",
+    "cpv": "33100000"
+  },
+  {
+    "id": "notice_005",
+    "title": "Office Furniture and Equipment",
+    "description": "Supply of ergonomic office furniture, desks, chairs, filing cabinets, and office equipment for new government building complex.",
+    "cpv": "39130000"
+  },
+  {
+    "id": "notice_006",
+    "title": "Software Development Services",
+    "description": "Custom software development for citizen services portal, including web application development, mobile app creation, and API integration services.",
+    "cpv": "72212000"
+  },
+  {
+    "id": "notice_007",
+    "title": "Building Renovation Project",
+    "description": "Complete renovation of historic municipal building including structural repairs, electrical system upgrades, plumbing improvements, and interior refurbishment.",
+    "cpv": "45453000"
+  },
+  {
+    "id": "notice_008",
+    "title": "Cleaning Services Contract",
+    "description": "Daily cleaning and maintenance services for government office buildings, including floor care, waste management, and sanitation services.",
+    "cpv": "90910000"
+  },
+  {
+    "id": "notice_009",
+    "title": "Vehicle Fleet Procurement",
+    "description": "Purchase of electric and hybrid vehicles for municipal fleet including passenger cars, vans, and light commercial vehicles with charging infrastructure.",
+    "cpv": "34110000"
+  },
+  {
+    "id": "notice_010",
+    "title": "Consulting Services for Digital Transformation",
+    "description": "Strategic consulting services for digital transformation initiatives, business process optimization, and change management for public sector organizations.",
+    "cpv": "72224000"
+  }
+]
