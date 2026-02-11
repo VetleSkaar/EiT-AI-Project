@@ -11,6 +11,10 @@ import httpx
 logger = logging.getLogger(__name__)
 
 
+# Configuration constants
+MAX_DESCRIPTION_EXCERPT_LENGTH = 800
+
+
 class SimilarNotice(BaseModel):
     """A similar notice with ranking information."""
     notice_id: str = Field(..., description="The ID of the similar notice")
@@ -113,16 +117,16 @@ class OllamaClient:
             return self._parse_response(response_text)
     
     def _format_similar_notices(self, notices: List[dict]) -> str:
-        """Format similar notices for context, with description truncated to 800 chars."""
+        """Format similar notices for context, with description truncated to max length."""
         if not notices:
             return "No similar notices found."
         
         formatted = []
         for i, notice in enumerate(notices, 1):
-            # Truncate description to 800 chars
+            # Truncate description to max length
             desc = notice.get('description_excerpt', 'N/A')
-            if desc and len(desc) > 800:
-                desc = desc[:800]
+            if desc and len(desc) > MAX_DESCRIPTION_EXCERPT_LENGTH:
+                desc = desc[:MAX_DESCRIPTION_EXCERPT_LENGTH]
             
             notice_info = [
                 f"Notice {i}:",

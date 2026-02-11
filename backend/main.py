@@ -5,11 +5,16 @@ from typing import Optional, List, Dict
 from dotenv import load_dotenv
 import os
 import json
+import logging
 from pathlib import Path
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
-from app.services.llm import analyze_draft_with_llm, AnalysisResult
+from app.services.llm import analyze_draft_with_llm, AnalysisResult, MAX_DESCRIPTION_EXCERPT_LENGTH
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -84,7 +89,7 @@ async def startup_event():
     data_path = Path(__file__).parent / "data" / "notices.cleaned.json"
     
     if not data_path.exists():
-        print(f"Warning: {data_path} not found. TF-IDF will not be available.")
+        logger.warning(f"{data_path} not found. TF-IDF will not be available.")
         return
     
     with open(data_path, 'r') as f:
@@ -101,7 +106,7 @@ async def startup_event():
         tfidf_vectorizer = TfidfVectorizer(stop_words='english')
         tfidf_matrix = tfidf_vectorizer.fit_transform(documents)
         
-        print(f"Loaded {len(notices_data)} notices and built TF-IDF matrix")
+        logger.info(f"Loaded {len(notices_data)} notices and built TF-IDF matrix")
 
 
 @app.get("/")
@@ -164,9 +169,9 @@ async def analyze_draft(draft_id: int):
         notice = notices_data[idx].copy()
         notice['similarity_score'] = float(similarities[idx])
         
-        # Truncate description_excerpt to max 800 chars
+        # Truncate description_excerpt to max length
         if 'description_excerpt' in notice and notice['description_excerpt']:
-            notice['description_excerpt'] = notice['description_excerpt'][:800]
+            notice['description_excerpt'] = notice['description_excerpt'][:MAX_DESCRIPTION_EXCERPT_LENGTH]
         
         retrieved_notices.append(notice)
     
@@ -186,7 +191,7 @@ async def analyze_draft(draft_id: int):
         
     except Exception as e:
         # If LLM fails, log the error but continue
-        print(f"LLM analysis failed: {e}")
+        logger.error(f"LLM analysis failed for draft {draft_id}: {e}")
         # Return a minimal analysis structure
         analysis = {
             "error": str(e),
