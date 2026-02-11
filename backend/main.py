@@ -54,10 +54,18 @@ class Draft(BaseModel):
 
 
 class Notice(BaseModel):
-    id: str
+    notice_id: str
+    url: str
     title: str
-    description: str
-    cpv: str
+    buyer: str
+    cpv_codes: List[str]
+    published_date: str
+    deadline: str
+    estimated_value_nok: Optional[int] = None
+    procedure: str
+    duration: str
+    description_raw: str
+    description_excerpt: str
     similarity_score: float
 
 
@@ -83,9 +91,9 @@ async def startup_event():
     
     # Build TF-IDF matrix
     if notices_data:
-        # Combine title and description for each notice
+        # Combine title and description_excerpt for each notice
         documents = [
-            f"{notice.get('title', '')} {notice.get('description', '')}"
+            f"{notice.get('title', '')} {notice.get('description_excerpt', '')}"
             for notice in notices_data
         ]
         

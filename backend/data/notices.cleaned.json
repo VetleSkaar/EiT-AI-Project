@@ -1,62 +1,142 @@
 [
   {
-    "id": "notice_001",
+    "notice_id": "notice_001",
+    "url": "https://doffin.no/notice/details/2024-123456",
     "title": "Construction of new hospital wing",
-    "description": "Tender for construction and development of a modern hospital wing with state-of-the-art medical facilities, including operating rooms, patient wards, and diagnostic equipment areas.",
-    "cpv": "45215140"
+    "buyer": "Oslo University Hospital",
+    "cpv_codes": ["45215140"],
+    "published_date": "2024-01-15",
+    "deadline": "2024-03-15",
+    "estimated_value_nok": 150000000,
+    "procedure": "Open procedure",
+    "duration": "24 months",
+    "description_raw": "TENDER NOTICE - Construction and Development Project\n\nThe Oslo University Hospital invites tenders for the construction and development of a modern hospital wing with state-of-the-art medical facilities. The project includes:\n\n1. Operating rooms with advanced surgical equipment\n2. Patient wards with modern amenities\n3. Diagnostic equipment areas\n4. Support facilities and infrastructure\n\nContractors must demonstrate experience in healthcare facility construction and meet all regulatory requirements.",
+    "description_excerpt": "Construction and development of modern hospital wing with medical facilities, operating rooms, patient wards, and diagnostic equipment areas."
   },
   {
-    "id": "notice_002",
+    "notice_id": "notice_002",
+    "url": "https://doffin.no/notice/details/2024-123457",
     "title": "IT Infrastructure Upgrade",
-    "description": "Supply and installation of network infrastructure, servers, and cloud computing solutions for government offices. Includes data center equipment and networking hardware.",
-    "cpv": "48000000"
+    "buyer": "Norwegian Government IT Services",
+    "cpv_codes": ["48000000", "48820000"],
+    "published_date": "2024-01-20",
+    "deadline": "2024-03-20",
+    "estimated_value_nok": 45000000,
+    "procedure": "Restricted procedure",
+    "duration": "36 months",
+    "description_raw": "REQUEST FOR PROPOSALS - IT Infrastructure Modernization\n\nThe Norwegian Government IT Services seeks proposals for supply and installation of comprehensive network infrastructure, servers, and cloud computing solutions for government offices.\n\nScope includes:\n- Data center equipment and infrastructure\n- Networking hardware (switches, routers, firewalls)\n- Cloud migration and integration services\n- 24/7 support and maintenance\n\nBidders must have proven track record in large-scale IT deployments.",
+    "description_excerpt": "Supply and installation of network infrastructure, servers, and cloud computing solutions for government offices including data center equipment and networking hardware."
   },
   {
-    "id": "notice_003",
+    "notice_id": "notice_003",
+    "url": "https://doffin.no/notice/details/2024-123458",
     "title": "Road Maintenance Services",
-    "description": "Annual road maintenance contract covering asphalt repair, pothole filling, line marking, and winter maintenance services for municipal roads.",
-    "cpv": "45233142"
+    "buyer": "Oslo Municipality Public Works",
+    "cpv_codes": ["45233142", "45233120"],
+    "published_date": "2024-02-01",
+    "deadline": "2024-04-01",
+    "estimated_value_nok": 25000000,
+    "procedure": "Open procedure",
+    "duration": "12 months with renewal option",
+    "description_raw": "ANNUAL CONTRACT - Road Maintenance and Winter Services\n\nOslo Municipality Public Works Department requires comprehensive road maintenance services covering:\n\n- Asphalt repair and resurfacing\n- Pothole filling and preventive maintenance\n- Road line marking and signage\n- Winter maintenance (snow removal, de-icing)\n- Emergency response services\n\nThe contract covers approximately 500km of municipal roads. Service level agreements apply.",
+    "description_excerpt": "Annual road maintenance covering asphalt repair, pothole filling, line marking, and winter maintenance for municipal roads."
   },
   {
-    "id": "notice_004",
+    "notice_id": "notice_004",
+    "url": "https://doffin.no/notice/details/2024-123459",
     "title": "Medical Equipment Supply",
-    "description": "Procurement of diagnostic medical equipment including MRI machines, CT scanners, ultrasound devices, and laboratory testing equipment for regional hospitals.",
-    "cpv": "33100000"
+    "buyer": "Regional Health Authority South-East",
+    "cpv_codes": ["33100000", "33111000"],
+    "published_date": "2024-02-05",
+    "deadline": "2024-04-05",
+    "estimated_value_nok": 80000000,
+    "procedure": "Open procedure",
+    "duration": "48 months framework agreement",
+    "description_raw": "FRAMEWORK AGREEMENT - Medical Diagnostic Equipment\n\nThe Regional Health Authority South-East invites tenders for procurement of advanced diagnostic medical equipment for regional hospitals:\n\n- MRI machines (3T and 1.5T)\n- CT scanners with latest imaging technology\n- Ultrasound devices for various applications\n- Laboratory testing equipment\n- Installation, training, and maintenance included\n\nEquipment must meet CE certification and Norwegian health regulations.",
+    "description_excerpt": "Procurement of diagnostic medical equipment including MRI machines, CT scanners, ultrasound devices, and laboratory testing equipment for regional hospitals."
   },
   {
-    "id": "notice_005",
+    "notice_id": "notice_005",
+    "url": "https://doffin.no/notice/details/2024-123460",
     "title": "Office Furniture and Equipment",
-    "description": "Supply of ergonomic office furniture, desks, chairs, filing cabinets, and office equipment for new government building complex.",
-    "cpv": "39130000"
+    "buyer": "Ministry of Finance",
+    "cpv_codes": ["39130000", "39110000"],
+    "published_date": "2024-02-10",
+    "deadline": "2024-03-25",
+    "estimated_value_nok": 12000000,
+    "procedure": "Open procedure",
+    "duration": "6 months delivery period",
+    "description_raw": "TENDER - Office Furniture and Equipment Supply\n\nThe Ministry of Finance requires complete office furnishing for new government building complex:\n\n- Ergonomic office furniture (desks, chairs)\n- Filing cabinets and storage solutions\n- Conference room furniture\n- Reception area furnishings\n- Office equipment and accessories\n\nAll furniture must meet environmental and ergonomic standards. Delivery and installation included.",
+    "description_excerpt": "Supply of ergonomic office furniture, desks, chairs, filing cabinets, and office equipment for new government building complex."
   },
   {
-    "id": "notice_006",
+    "notice_id": "notice_006",
+    "url": "https://doffin.no/notice/details/2024-123461",
     "title": "Software Development Services",
-    "description": "Custom software development for citizen services portal, including web application development, mobile app creation, and API integration services.",
-    "cpv": "72212000"
+    "buyer": "Digital Norway Agency",
+    "cpv_codes": ["72212000", "72263000"],
+    "published_date": "2024-02-15",
+    "deadline": "2024-04-15",
+    "estimated_value_nok": 35000000,
+    "procedure": "Competitive dialogue",
+    "duration": "24 months with extension option",
+    "description_raw": "REQUEST FOR PROPOSALS - Custom Software Development\n\nDigital Norway Agency seeks development partner for citizen services portal project:\n\n- Web application development (responsive design)\n- Mobile app creation (iOS and Android)\n- API integration with existing government systems\n- Security and compliance implementation\n- User experience design\n- Testing and quality assurance\n- Documentation and training\n\nAgile development methodology required. Must comply with WCAG 2.1 accessibility standards.",
+    "description_excerpt": "Custom software development for citizen services portal including web application development, mobile app creation, and API integration services."
   },
   {
-    "id": "notice_007",
+    "notice_id": "notice_007",
+    "url": "https://doffin.no/notice/details/2024-123462",
     "title": "Building Renovation Project",
-    "description": "Complete renovation of historic municipal building including structural repairs, electrical system upgrades, plumbing improvements, and interior refurbishment.",
-    "cpv": "45453000"
+    "buyer": "Bergen City Council",
+    "cpv_codes": ["45453000", "45310000"],
+    "published_date": "2024-02-20",
+    "deadline": "2024-04-20",
+    "estimated_value_nok": 65000000,
+    "procedure": "Open procedure",
+    "duration": "18 months",
+    "description_raw": "MAJOR RENOVATION - Historic Municipal Building\n\nBergen City Council invites tenders for complete renovation of historic municipal building (built 1885):\n\n- Structural repairs and foundation work\n- Electrical system upgrades to modern standards\n- Plumbing improvements and new HVAC\n- Interior refurbishment preserving historic features\n- Accessibility improvements\n- Energy efficiency measures\n\nContractors must have heritage building experience. All work subject to cultural heritage regulations.",
+    "description_excerpt": "Complete renovation of historic municipal building including structural repairs, electrical system upgrades, plumbing improvements, and interior refurbishment."
   },
   {
-    "id": "notice_008",
+    "notice_id": "notice_008",
+    "url": "https://doffin.no/notice/details/2024-123463",
     "title": "Cleaning Services Contract",
-    "description": "Daily cleaning and maintenance services for government office buildings, including floor care, waste management, and sanitation services.",
-    "cpv": "90910000"
+    "buyer": "Norwegian State Properties",
+    "cpv_codes": ["90910000", "90919200"],
+    "published_date": "2024-02-25",
+    "deadline": "2024-04-10",
+    "estimated_value_nok": 18000000,
+    "procedure": "Open procedure",
+    "duration": "36 months with 2-year extension option",
+    "description_raw": "SERVICE CONTRACT - Cleaning and Maintenance Services\n\nNorwegian State Properties requires daily cleaning and maintenance services for government office buildings (total 50,000 m²):\n\n- Daily office cleaning\n- Floor care and maintenance\n- Waste management and recycling\n- Sanitation services\n- Window cleaning (quarterly)\n- Deep cleaning services\n- Green cleaning products required\n\nService level agreements with performance metrics apply.",
+    "description_excerpt": "Daily cleaning and maintenance services for government office buildings including floor care, waste management, and sanitation services."
   },
   {
-    "id": "notice_009",
+    "notice_id": "notice_009",
+    "url": "https://doffin.no/notice/details/2024-123464",
     "title": "Vehicle Fleet Procurement",
-    "description": "Purchase of electric and hybrid vehicles for municipal fleet including passenger cars, vans, and light commercial vehicles with charging infrastructure.",
-    "cpv": "34110000"
+    "buyer": "Trondheim Municipality",
+    "cpv_codes": ["34110000", "34144000"],
+    "published_date": "2024-03-01",
+    "deadline": "2024-04-30",
+    "estimated_value_nok": 42000000,
+    "procedure": "Open procedure",
+    "duration": "12 months delivery schedule",
+    "description_raw": "VEHICLE PROCUREMENT - Electric and Hybrid Fleet\n\nTrondheim Municipality seeks to purchase electric and hybrid vehicles for municipal fleet replacement:\n\n- Electric passenger cars (25 units)\n- Hybrid vans (15 units)\n- Light commercial electric vehicles (10 units)\n- Charging infrastructure and installation\n- Maintenance contracts\n- Driver training for electric vehicles\n\nAll vehicles must meet Norwegian emission standards and have minimum 300km range.",
+    "description_excerpt": "Purchase of electric and hybrid vehicles for municipal fleet including passenger cars, vans, and light commercial vehicles with charging infrastructure."
   },
   {
-    "id": "notice_010",
+    "notice_id": "notice_010",
+    "url": "https://doffin.no/notice/details/2024-123465",
     "title": "Consulting Services for Digital Transformation",
-    "description": "Strategic consulting services for digital transformation initiatives, business process optimization, and change management for public sector organizations.",
-    "cpv": "72224000"
+    "buyer": "Innovation Norway",
+    "cpv_codes": ["72224000", "79400000"],
+    "published_date": "2024-03-05",
+    "deadline": "2024-05-05",
+    "estimated_value_nok": 28000000,
+    "procedure": "Negotiated procedure",
+    "duration": "24 months",
+    "description_raw": "CONSULTING SERVICES - Digital Transformation Strategy\n\nInnovation Norway seeks strategic consulting services for comprehensive digital transformation program:\n\n- Digital transformation strategy development\n- Business process optimization and re-engineering\n- Change management and organizational development\n- Technology assessment and roadmap\n- Implementation support\n- Training and capability building\n- Performance measurement framework\n\nConsultants must demonstrate public sector experience and proven digital transformation track record.",
+    "description_excerpt": "Strategic consulting services for digital transformation initiatives, business process optimization, and change management for public sector organizations."
   }
 ]
