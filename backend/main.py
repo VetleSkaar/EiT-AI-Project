@@ -169,7 +169,8 @@ async def analyze_draft(draft_id: int):
         notice = notices_data[idx].copy()
         notice['similarity_score'] = float(similarities[idx])
         
-        # Truncate description_excerpt to max length
+        # Truncate description_excerpt to max length for storage and API response
+        # Note: This is also done in LLM service for defensive programming
         if 'description_excerpt' in notice and notice['description_excerpt']:
             notice['description_excerpt'] = notice['description_excerpt'][:MAX_DESCRIPTION_EXCERPT_LENGTH]
         

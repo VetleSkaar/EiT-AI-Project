@@ -123,9 +123,9 @@ class OllamaClient:
         
         formatted = []
         for i, notice in enumerate(notices, 1):
-            # Truncate description to max length
+            # Get description and truncate if needed (defensive programming)
             desc = notice.get('description_excerpt', 'N/A')
-            if desc and len(desc) > MAX_DESCRIPTION_EXCERPT_LENGTH:
+            if desc != 'N/A' and len(desc) > MAX_DESCRIPTION_EXCERPT_LENGTH:
                 desc = desc[:MAX_DESCRIPTION_EXCERPT_LENGTH]
             
             notice_info = [
