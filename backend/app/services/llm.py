@@ -11,6 +11,10 @@ import httpx
 logger = logging.getLogger(__name__)
 
 
+# Configuration constants
+MAX_DESCRIPTION_EXCERPT_LENGTH = 800
+
+
 class SimilarNotice(BaseModel):
     """A similar notice with ranking information."""
     notice_id: str = Field(..., description="The ID of the similar notice")
@@ -113,12 +117,17 @@ class OllamaClient:
             return self._parse_response(response_text)
     
     def _format_similar_notices(self, notices: List[dict]) -> str:
-        """Format similar notices for context."""
+        """Format similar notices for context, with description truncated to max length."""
         if not notices:
             return "No similar notices found."
         
         formatted = []
         for i, notice in enumerate(notices, 1):
+            # Get description and truncate if needed (defensive programming)
+            desc = notice.get('description_excerpt', 'N/A')
+            if desc != 'N/A' and len(desc) > MAX_DESCRIPTION_EXCERPT_LENGTH:
+                desc = desc[:MAX_DESCRIPTION_EXCERPT_LENGTH]
+            
             notice_info = [
                 f"Notice {i}:",
                 f"  ID: {notice.get('notice_id', 'N/A')}",
@@ -127,7 +136,7 @@ class OllamaClient:
                 f"  CPV: {', '.join(notice.get('cpv_codes', []))}",
                 f"  Published: {notice.get('published_date', 'N/A')}",
                 f"  Similarity Score: {notice.get('similarity_score', 0):.3f}",
-                f"  Description: {notice.get('description_excerpt', 'N/A')[:self.MAX_DESCRIPTION_LENGTH]}..."
+                f"  Description: {desc}"
             ]
             formatted.append("\n".join(notice_info))
         
@@ -140,7 +149,7 @@ class OllamaClient:
         similar_context: str,
         cpv: Optional[str]
     ) -> str:
-        """Create the analysis prompt."""
+        """Create the analysis prompt with rubric priorities."""
         cpv_text = f"\nCPV Code: {cpv}" if cpv else ""
         
         return f"""You are an expert in public procurement analysis. Analyze the following procurement draft and provide a detailed analysis.
@@ -151,6 +160,13 @@ Description: {description}{cpv_text}
 
 SIMILAR PAST NOTICES:
 {similar_context}
+
+RUBRIC PRIORITIES:
+When analyzing this procurement draft, prioritize the following dimensions:
+1. Risk Management: Assess potential risks, mitigation strategies, and contract safeguards
+2. Sustainability & Social Values: Evaluate environmental impact, social responsibility, and ethical considerations
+3. Transparency & Fair Competition: Analyze clarity of requirements, accessibility to bidders, and fairness
+4. Innovation & Forward-Thinking: Evaluate modern approaches, technological advancement, and future-readiness
 
 Please provide a comprehensive analysis in JSON format ONLY. Do not include any text before or after the JSON.
 
