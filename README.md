@@ -1,1 +1,132 @@
 # EiT-AI-Project
+
+A monorepo project with a FastAPI backend and Vue 3 + Vite frontend.
+
+## Project Structure
+
+```
+EiT-AI-Project/
+├── backend/          # FastAPI backend
+│   ├── main.py       # Main FastAPI application
+│   ├── requirements.txt
+│   └── .env.example  # Environment variables template
+├── frontend/         # Vue 3 + Vite frontend
+│   ├── src/
+│   ├── public/
+│   └── package.json
+└── README.md
+```
+
+## Prerequisites
+
+- Python 3.8 or higher
+- Node.js 16 or higher
+- npm or yarn
+
+## Backend Setup
+
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
+
+2. Create a virtual environment:
+   ```bash
+   python -m venv venv
+   ```
+
+3. Activate the virtual environment:
+   - On Windows:
+     ```bash
+     venv\Scripts\activate
+     ```
+   - On macOS/Linux:
+     ```bash
+     source venv/bin/activate
+     ```
+
+4. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+5. Copy `.env.example` to `.env` and configure as needed:
+   ```bash
+   cp .env.example .env
+   ```
+
+6. Run the development server:
+   ```bash
+   uvicorn main:app --reload
+   ```
+
+   The API will be available at http://localhost:8000
+
+## Frontend Setup
+
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+   The frontend will be available at http://localhost:5173
+
+## Development
+
+### Running Both Services
+
+For development, you'll need to run both the backend and frontend servers:
+
+1. In one terminal, start the backend:
+   ```bash
+   cd backend
+   source venv/bin/activate  # or venv\Scripts\activate on Windows
+   uvicorn main:app --reload
+   ```
+
+2. In another terminal, start the frontend:
+   ```bash
+   cd frontend
+   npm run dev
+   ```
+
+### API Documentation
+
+When the backend is running, you can access:
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
+
+### CORS Configuration
+
+The backend is configured to allow requests from the Vite dev server (http://localhost:5173). This is configured in `backend/main.py`.
+
+## Building for Production
+
+### Backend
+The backend can be run with:
+```bash
+uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+### Frontend
+Build the frontend:
+```bash
+cd frontend
+npm run build
+```
+
+The built files will be in `frontend/dist/`.
+
+## License
+
+[Add your license here]
