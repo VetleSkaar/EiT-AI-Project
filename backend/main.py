@@ -125,16 +125,16 @@ async def create_draft(draft: DraftCreate):
     return draft_data
 
 
-@app.post("/drafts/{id}/analyze")
-async def analyze_draft(id: int):
+@app.post("/drafts/{draft_id}/analyze")
+async def analyze_draft(draft_id: int):
     """Analyze a draft and rank similar notices using TF-IDF cosine similarity"""
-    if id not in drafts_db:
+    if draft_id not in drafts_db:
         raise HTTPException(status_code=404, detail="Draft not found")
     
     if tfidf_vectorizer is None or tfidf_matrix is None:
         raise HTTPException(status_code=503, detail="TF-IDF not initialized")
     
-    draft = drafts_db[id]
+    draft = drafts_db[draft_id]
     
     # Combine draft title and description
     draft_text = f"{draft['title']} {draft['description']}"
@@ -158,18 +158,18 @@ async def analyze_draft(id: int):
     
     # Store analysis result
     analysis_result = {
-        "draft_id": id,
+        "draft_id": draft_id,
         "top_notices": top_notices
     }
-    analysis_db[id] = analysis_result
+    analysis_db[draft_id] = analysis_result
     
-    return {"message": "Analysis complete", "draft_id": id}
+    return {"message": "Analysis complete", "draft_id": draft_id}
 
 
-@app.get("/drafts/{id}/analysis", response_model=Analysis)
-async def get_analysis(id: int):
+@app.get("/drafts/{draft_id}/analysis", response_model=Analysis)
+async def get_analysis(draft_id: int):
     """Get the analysis results for a draft"""
-    if id not in analysis_db:
+    if draft_id not in analysis_db:
         raise HTTPException(status_code=404, detail="Analysis not found for this draft")
     
-    return analysis_db[id]
+    return analysis_db[draft_id]
