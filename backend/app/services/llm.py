@@ -3,9 +3,12 @@ LLM Service for calling Ollama API to analyze procurement drafts.
 """
 import os
 import json
+import logging
 from typing import List, Optional
 from pydantic import BaseModel, Field, ValidationError
 import httpx
+
+logger = logging.getLogger(__name__)
 
 
 class SimilarNotice(BaseModel):
@@ -48,7 +51,11 @@ class AnalysisResult(BaseModel):
 class OllamaClient:
     """Client for interacting with Ollama API."""
     
-    def __init__(self, base_url: Optional[str] = None, model: str = "llama3.2"):
+    # Configuration constants
+    MAX_DESCRIPTION_LENGTH = 200
+    DEFAULT_TIMEOUT = 120.0
+    
+    def __init__(self, base_url: Optional[str] = None, model: str = "llama3.2", timeout: float = DEFAULT_TIMEOUT):
         """
         Initialize the Ollama client.
         
@@ -56,9 +63,11 @@ class OllamaClient:
             base_url: The base URL for Ollama API. If None, uses OLLAMA_API_URL from env
                      or defaults to http://localhost:11434
             model: The model to use for generation
+            timeout: Timeout in seconds for API calls
         """
         self.base_url = base_url or os.getenv("OLLAMA_API_URL", "http://localhost:11434")
         self.model = model
+        self.timeout = timeout
         self.chat_endpoint = f"{self.base_url}/api/chat"
     
     async def generate_analysis(
@@ -98,7 +107,7 @@ class OllamaClient:
             return self._parse_response(response_text)
         except (ValidationError, json.JSONDecodeError) as e:
             # Retry with stricter JSON-only prompt
-            print(f"First parse attempt failed: {e}. Retrying with stricter prompt.")
+            logger.warning(f"First parse attempt failed: {e}. Retrying with stricter prompt.")
             strict_prompt = self._create_strict_json_prompt(prompt)
             response_text = await self._call_ollama(strict_prompt)
             return self._parse_response(response_text)
@@ -118,7 +127,7 @@ class OllamaClient:
                 f"  CPV: {', '.join(notice.get('cpv_codes', []))}",
                 f"  Published: {notice.get('published_date', 'N/A')}",
                 f"  Similarity Score: {notice.get('similarity_score', 0):.3f}",
-                f"  Description: {notice.get('description_excerpt', 'N/A')[:200]}..."
+                f"  Description: {notice.get('description_excerpt', 'N/A')[:self.MAX_DESCRIPTION_LENGTH]}..."
             ]
             formatted.append("\n".join(notice_info))
         
@@ -192,7 +201,7 @@ Ensure all strings are properly quoted and all JSON syntax is correct."""
         Returns:
             The response text from the model
         """
-        async with httpx.AsyncClient(timeout=120.0) as client:
+        async with httpx.AsyncClient(timeout=self.timeout) as client:
             request_data = {
                 "model": self.model,
                 "messages": [
