@@ -24,7 +24,7 @@ import argparse
 import json
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 CPV_RE = re.compile(r"\b(\d{8})\b")
@@ -81,7 +81,11 @@ def normalize_cpv_codes(n: Dict[str, Any]) -> List[str]:
             if x is None:
                 continue
             s = str(x).strip()
-            codes.extend(CPV_RE.findall(s) or ([s] if s.isdigit() else []))
+            found = CPV_RE.findall(s)
+            if found:
+                codes.extend(found)
+            elif s.isdigit():
+                codes.append(s)
     elif isinstance(cpv, str):
         codes = CPV_RE.findall(cpv)
         if not codes and cpv.strip().isdigit():
@@ -234,7 +238,7 @@ def main():
 
     records = load_records(in_path)
 
-    seen: set[str] = set()
+    seen: Set[str] = set()
     cleaned_records: List[Dict[str, Any]] = []
     all_warnings: List[Dict[str, Any]] = []
 
