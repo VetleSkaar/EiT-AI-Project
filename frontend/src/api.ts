@@ -1,7 +1,11 @@
 import axios from 'axios';
 import type { Draft, DraftCreate, AnalysisResponse, AnalysisData } from './types';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+// Use /api prefix in development to leverage Vite proxy (avoids CORS)
+// In production, use the full API URL from environment variable
+const API_BASE_URL = import.meta.env.DEV 
+  ? '/api' 
+  : (import.meta.env.VITE_API_URL || 'http://localhost:8000');
 
 const api = axios.create({
   baseURL: API_BASE_URL,
