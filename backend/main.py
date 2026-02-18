@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List, Dict
 from dotenv import load_dotenv
+from contextlib import asynccontextmanager
 import os
 import json
 import logging
@@ -18,7 +19,58 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 
-app = FastAPI()
+# Global variables for TF-IDF
+notices_data = []
+tfidf_vectorizer = None
+tfidf_matrix = None
+
+# In-memory storage for drafts
+drafts_db: Dict[int, dict] = {}
+analysis_db: Dict[int, dict] = {}
+next_draft_id = 1
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan context manager for startup and shutdown events"""
+    global notices_data, tfidf_vectorizer, tfidf_matrix
+    
+    # Startup: Load notices data and build TF-IDF
+    data_path = Path(__file__).parent / "data" / "notices.cleaned.json"
+    
+    if not data_path.exists():
+        error_msg = (
+            f"ERROR: Required file {data_path} not found.\n"
+            f"Please run the cleaning script first:\n"
+            f"  python backend/scripts/clean_notices.py --in <input_file> --out backend/data/notices.cleaned.json\n"
+            f"See README.md for details."
+        )
+        logger.error(error_msg)
+        raise FileNotFoundError(error_msg)
+    
+    with open(data_path, 'r') as f:
+        notices_data = json.load(f)
+    
+    # Build TF-IDF matrix
+    if notices_data:
+        # Combine title and description_excerpt for each notice
+        documents = [
+            f"{notice.get('title', '')} {notice.get('description_excerpt', '')}"
+            for notice in notices_data
+        ]
+        
+        tfidf_vectorizer = TfidfVectorizer(stop_words='english')
+        tfidf_matrix = tfidf_vectorizer.fit_transform(documents)
+        
+        logger.info(f"Loaded {len(notices_data)} notices and built TF-IDF matrix")
+    
+    yield
+    
+    # Shutdown: cleanup if needed
+    logger.info("Shutting down application")
+
+
+app = FastAPI(lifespan=lifespan)
 
 # Configure CORS
 origins = [
@@ -78,41 +130,6 @@ class Notice(BaseModel):
 class Analysis(BaseModel):
     draft_id: int
     top_notices: List[Notice]
-
-
-@app.on_event("startup")
-async def startup_event():
-    """Load notices data and build TF-IDF on startup"""
-    global notices_data, tfidf_vectorizer, tfidf_matrix
-    
-    # Load notices.cleaned.json
-    data_path = Path(__file__).parent / "data" / "notices.cleaned.json"
-    
-    if not data_path.exists():
-        error_msg = (
-            f"ERROR: Required file {data_path} not found.\n"
-            f"Please run the cleaning script first:\n"
-            f"  python backend/scripts/clean_notices.py --in <input_file> --out backend/data/notices.cleaned.json\n"
-            f"See README.md for details."
-        )
-        logger.error(error_msg)
-        raise FileNotFoundError(error_msg)
-    
-    with open(data_path, 'r') as f:
-        notices_data = json.load(f)
-    
-    # Build TF-IDF matrix
-    if notices_data:
-        # Combine title and description_excerpt for each notice
-        documents = [
-            f"{notice.get('title', '')} {notice.get('description_excerpt', '')}"
-            for notice in notices_data
-        ]
-        
-        tfidf_vectorizer = TfidfVectorizer(stop_words='english')
-        tfidf_matrix = tfidf_vectorizer.fit_transform(documents)
-        
-        logger.info(f"Loaded {len(notices_data)} notices and built TF-IDF matrix")
 
 
 @app.get("/")
