@@ -131,7 +131,14 @@ The script will print a summary of:
    npm install
    ```
 
-3. Run the development server:
+3. Copy `.env.example` to `.env` and configure as needed:
+   ```bash
+   cp .env.example .env
+   ```
+   
+   **Note:** In development mode, the Vite dev server automatically proxies API requests to the backend (http://localhost:8000), so you typically don't need to modify the default `.env` settings. The proxy configuration eliminates CORS issues during development.
+
+4. Run the development server:
    ```bash
    npm run dev
    ```
@@ -166,6 +173,8 @@ When the backend is running, you can access:
 ### CORS Configuration
 
 The backend is configured to allow requests from the Vite dev server (http://localhost:5173). This is configured in `backend/main.py`.
+
+Additionally, the frontend uses a Vite proxy in development mode to forward `/api` requests to the backend at `http://localhost:8000`. This eliminates CORS issues during development. The proxy configuration is in `frontend/vite.config.ts`.
 
 ## Building for Production
 
