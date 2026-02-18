@@ -89,8 +89,14 @@ async def startup_event():
     data_path = Path(__file__).parent / "data" / "notices.cleaned.json"
     
     if not data_path.exists():
-        logger.warning(f"{data_path} not found. TF-IDF will not be available.")
-        return
+        error_msg = (
+            f"ERROR: Required file {data_path} not found.\n"
+            f"Please run the cleaning script first:\n"
+            f"  python backend/scripts/clean_notices.py --in <input_file> --out backend/data/notices.cleaned.json\n"
+            f"See README.md for details."
+        )
+        logger.error(error_msg)
+        raise FileNotFoundError(error_msg)
     
     with open(data_path, 'r') as f:
         notices_data = json.load(f)
