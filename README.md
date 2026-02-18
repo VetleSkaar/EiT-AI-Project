@@ -70,6 +70,55 @@ EiT-AI-Project/
 
    The API will be available at http://localhost:8000
 
+## Data Preparation
+
+The backend requires a cleaned procurement notice dataset. Use the provided cleaning script to prepare your data:
+
+### Cleaning Doffin Notices
+
+The `backend/scripts/clean_notices.py` script processes raw procurement notice data and prepares it for use with the application.
+
+**Input formats supported:**
+- JSON array file (e.g., `data/notices.json`)
+- JSONL file (e.g., `data/notices.jsonl`)
+
+**What the script does:**
+- Deduplicates records by notice_id
+- Normalizes CPV codes to 8-digit strings
+- Normalizes dates to YYYY-MM-DD format
+- Creates/trims description excerpts (default max 1200 chars)
+- Validates and fills required fields
+- Outputs warnings for data quality issues
+
+**Usage:**
+
+```bash
+cd backend
+python scripts/clean_notices.py --in data/notices.json --out data/notices.cleaned.json
+```
+
+Or with JSONL input:
+
+```bash
+python scripts/clean_notices.py --in data/notices.jsonl --out data/notices.cleaned.json
+```
+
+**Optional parameters:**
+
+```bash
+python scripts/clean_notices.py \
+  --in data/notices.json \
+  --out data/notices.cleaned.json \
+  --excerpt-max 1500
+```
+
+The script will print a summary of:
+- Number of records loaded
+- Number of cleaned records written
+- Any warnings about data quality (missing fields, duplicates, etc.)
+
+**Note:** The backend will fail to start if `backend/data/notices.cleaned.json` is missing. Always run the cleaning script first when setting up a new environment or updating the dataset.
+
 ## Frontend Setup
 
 1. Navigate to the frontend directory:
