@@ -31,6 +31,67 @@ EiT-AI-Project/
 - Node.js 16 or higher
 - npm or yarn
 
+## Docker Setup (Recommended)
+
+Docker is the easiest way to get the project running without worrying about local Python/Node version conflicts.
+
+### Requirements
+
+- [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Steps
+
+1. Copy the backend environment file and configure it:
+   ```bash
+   cp backend/.env.example backend/.env
+   ```
+   When using Docker Compose, set `OLLAMA_API_URL=http://ollama:11434` in `backend/.env` so the backend container can reach the Ollama service.
+
+2. Prepare your data (run once before starting the containers):
+   ```bash
+   # You can run this with a temporary container if you don't have Python installed locally:
+   docker compose run --rm backend python scripts/clean_notices.py \
+     --in data/notices.json --out data/notices.cleaned.json
+   ```
+   Or if Python is available locally, follow the [Data Preparation](#data-preparation) section below.
+
+3. Copy the frontend environment file:
+   ```bash
+   cp frontend/.env.example frontend/.env
+   ```
+
+4. Start all services:
+   ```bash
+   docker compose up --build
+   ```
+
+   This starts:
+   - **backend** at http://localhost:8000
+   - **frontend** at http://localhost:5173
+   - **ollama** at http://localhost:11434
+
+5. (First run) Pull the Ollama model:
+   ```bash
+   docker compose exec ollama ollama pull llama3.2
+   ```
+
+6. To stop all services:
+   ```bash
+   docker compose down
+   ```
+
+> **Note:** The `backend/data` directory is mounted as a volume so your data files are shared between the host and the container.
+
+## Manual Setup
+
+> If you prefer Docker, see the [Docker Setup](#docker-setup-recommended) section above.
+
+### Prerequisites
+
+- Python 3.8 or higher
+- Node.js 16 or higher
+- npm or yarn
+
 ## Backend Setup
 
 1. Navigate to the backend directory:
