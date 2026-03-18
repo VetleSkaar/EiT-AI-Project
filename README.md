@@ -30,71 +30,26 @@ EiT-AI-Project/
 - Python 3.8 or higher
 - Node.js 16 or higher
 - npm or yarn
-- [Ollama](https://ollama.com/download) (for local/manual setup; included automatically in Docker Compose)
+- [Ollama](https://ollama.com/download) running on your laptop
 
 ## Ollama Setup
 
-The application uses [Ollama](https://ollama.com) to run a local LLM. How you set it up depends on whether you're using Docker Compose or the manual setup.
+The application uses [Ollama](https://ollama.com) to run a local LLM **on your own machine**. No Ollama container is included in Docker Compose — the application always connects to the Ollama instance already running on your laptop at port 11434.
 
-### Option A – Ollama inside Docker Compose (recommended)
-
-Docker Compose starts an `ollama` container automatically. After starting the stack, pull the model once:
-
-```bash
-docker compose exec ollama ollama pull llama3.2
-```
-
-Set the following in `backend/.env`:
-
-```
-OLLAMA_API_URL=http://ollama:11434
-```
-
-### Option B – Ollama running on your host machine (Docker + local Ollama)
-
-If you want to use an Ollama instance already running on your computer instead of the one inside Docker:
-
-1. [Install Ollama](https://ollama.com/download) and start it:
+1. [Install Ollama](https://ollama.com/download) if you haven't already.
+2. Start Ollama (it usually starts automatically after install, but you can also run):
    ```bash
    ollama serve
    ```
-2. Pull the required model:
+3. Pull the required model:
    ```bash
    ollama pull llama3.2
    ```
-3. Point the backend container to your host. Set the following in `backend/.env`:
-   - **macOS / Windows** (Docker Desktop):
-     ```
-     OLLAMA_API_URL=http://host.docker.internal:11434
-     ```
-   - **Linux** (Docker daemon on host network):
-     ```
-     OLLAMA_API_URL=http://172.17.0.1:11434
-     ```
-   Then start only the backend and frontend containers (skip the bundled ollama service):
-   ```bash
-   docker compose up --build backend frontend
-   ```
-
-### Option C – Ollama for manual (non-Docker) setup
-
-1. [Install Ollama](https://ollama.com/download) and start it:
-   ```bash
-   ollama serve
-   ```
-2. Pull the required model:
-   ```bash
-   ollama pull llama3.2
-   ```
-3. Verify it is reachable:
+4. Verify it is reachable:
    ```bash
    curl http://localhost:11434
    ```
    You should see `Ollama is running`.
-4. Keep the default value in `backend/.env`:
-   ```
-   OLLAMA_API_URL=http://localhost:11434
-   ```
 
 > **Model name:** The default model is `llama3.2`. If you want to use a different model, change `OLLAMA_MODEL` in `backend/.env` and pull that model with `ollama pull <model-name>`.
 
@@ -108,17 +63,15 @@ Docker is the easiest way to get the project running without worrying about loca
 
 ### Steps
 
-1. Copy the backend environment file and configure it:
+1. Make sure Ollama is running on your laptop and the model is pulled (see [Ollama Setup](#ollama-setup) above).
+
+2. Copy the backend environment file:
    ```bash
    cp backend/.env.example backend/.env
    ```
-   Open `backend/.env` and set the Ollama URL for Docker Compose:
-   ```
-   OLLAMA_API_URL=http://ollama:11434
-   ```
-   This tells the backend container to reach the bundled `ollama` service. See the [Ollama Setup](#ollama-setup) section if you prefer to use Ollama running on your own machine instead.
+   Docker Compose automatically sets `OLLAMA_API_URL=http://host.docker.internal:11434` so the backend container can reach Ollama on your laptop — no changes needed.
 
-2. Prepare your data (run once before starting the containers):
+3. Prepare your data (run once before starting the containers):
    ```bash
    # You can run this with a temporary container if you don't have Python installed locally:
    docker compose run --rm backend python scripts/clean_notices.py \
@@ -126,12 +79,12 @@ Docker is the easiest way to get the project running without worrying about loca
    ```
    Or if Python is available locally, follow the [Data Preparation](#data-preparation) section below.
 
-3. Copy the frontend environment file:
+4. Copy the frontend environment file:
    ```bash
    cp frontend/.env.example frontend/.env
    ```
 
-4. Start all services:
+5. Start all services:
    ```bash
    docker compose up --build
    ```
@@ -139,13 +92,6 @@ Docker is the easiest way to get the project running without worrying about loca
    This starts:
    - **backend** at http://localhost:8000
    - **frontend** at http://localhost:5173
-   - **ollama** at http://localhost:11434
-
-5. (First run only) Pull the Ollama model inside the container:
-   ```bash
-   docker compose exec ollama ollama pull llama3.2
-   ```
-   This only needs to be done once; the model is stored in the `ollama_data` Docker volume and persists across restarts.
 
 6. To stop all services:
    ```bash
@@ -167,7 +113,7 @@ Docker is the easiest way to get the project running without worrying about loca
 
 ### Ollama
 
-Follow [Option C – Ollama for manual setup](#option-c--ollama-for-manual-non-docker-setup) above to install Ollama, start it, and pull the model before starting the backend.
+Follow the [Ollama Setup](#ollama-setup) section above to install Ollama, start it, and pull the model before starting the backend.
 
 ## Backend Setup
 
@@ -338,22 +284,25 @@ The built files will be in `frontend/dist/`.
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | `Connection refused` on `http://localhost:11434` | Ollama is not running | Run `ollama serve` |
-| Backend logs `LLM analysis failed` | Wrong `OLLAMA_API_URL` | Check the value in `backend/.env` matches your setup (see [Ollama Setup](#ollama-setup)) |
-| Docker backend cannot reach host Ollama | Container uses `localhost`, not the host | Use `http://host.docker.internal:11434` (macOS/Windows) or `http://172.17.0.1:11434` (Linux) |
-| `model 'llama3.2' not found` | Model not pulled yet | Run `ollama pull llama3.2` (or `docker compose exec ollama ollama pull llama3.2` for Docker) |
+| Backend logs `LLM analysis failed` | Wrong `OLLAMA_API_URL` | Check the value matches your setup (see [Ollama Setup](#ollama-setup)) |
+| Docker backend cannot reach host Ollama | Container uses `localhost`, not the host | The compose file sets `host.docker.internal` automatically; on Linux ensure Docker version ≥ 20.10 |
+| `model 'llama3.2' not found` | Model not pulled yet | Run `ollama pull llama3.2` |
 
 ### Verify Ollama is reachable
 
-From your terminal (or from inside the backend container with `docker compose exec backend bash`):
+From your terminal:
 
 ```bash
-# Replace the URL with your actual OLLAMA_API_URL value, e.g.:
-curl http://localhost:11434/api/tags            # manual setup
-curl http://ollama:11434/api/tags               # Docker Compose
-curl http://host.docker.internal:11434/api/tags # Docker + host Ollama (macOS/Windows)
+curl http://localhost:11434/api/tags
 ```
 
-A successful response lists all downloaded models. If you get an error, double-check the URL and that Ollama is running.
+From inside the backend container:
+
+```bash
+docker compose exec backend curl http://host.docker.internal:11434/api/tags
+```
+
+A successful response lists all downloaded models. If you get an error, double-check that Ollama is running on your laptop.
 
 ## License
 
