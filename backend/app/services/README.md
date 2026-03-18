@@ -21,7 +21,7 @@ pip install -r requirements.txt
 
 2. Configure environment variables in `.env`:
 ```bash
-OLLAMA_API_URL=http://localhost:11434
+OLLAMA_API_URL=http://host.docker.internal:11434
 ```
 
 3. Ensure Ollama is running on the configured endpoint.

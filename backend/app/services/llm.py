@@ -4,6 +4,7 @@ LLM Service for calling Ollama API to analyze procurement drafts.
 import os
 import json
 import logging
+import time
 from typing import List, Optional
 from pydantic import BaseModel, Field, ValidationError
 import httpx
@@ -12,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 # Configuration constants
-MAX_DESCRIPTION_EXCERPT_LENGTH = 800
+MAX_DESCRIPTION_EXCERPT_LENGTH = 200
 
 
 class SimilarNotice(BaseModel):
@@ -49,7 +50,7 @@ class AnalysisResult(BaseModel):
     qualitative_analysis: QualitativeAnalysis = Field(..., description="Qualitative analysis")
     recommendation: Recommendation = Field(..., description="Recommendation")
     confidence: float = Field(..., ge=0.0, le=1.0, description="Confidence score (0.0 to 1.0)")
-    caveats: str = Field(..., description="Caveats and limitations of the analysis")
+    caveats: str = Field(default="", description="Caveats and limitations of the analysis")
 
 
 class OllamaClient:
@@ -57,20 +58,25 @@ class OllamaClient:
     
     # Configuration constants
     MAX_DESCRIPTION_LENGTH = 200
-    DEFAULT_TIMEOUT = 120.0
+    DEFAULT_TIMEOUT = 240.0
     
-    def __init__(self, base_url: Optional[str] = None, model: str = "llama3.2", timeout: float = DEFAULT_TIMEOUT):
+    def __init__(
+        self,
+        base_url: Optional[str] = None,
+        model: Optional[str] = None,
+        timeout: float = DEFAULT_TIMEOUT
+    ):
         """
         Initialize the Ollama client.
         
         Args:
             base_url: The base URL for Ollama API. If None, uses OLLAMA_API_URL from env
-                     or defaults to http://localhost:11434
+                     or defaults to http://host.docker.internal:11434
             model: The model to use for generation
             timeout: Timeout in seconds for API calls
         """
-        self.base_url = base_url or os.getenv("OLLAMA_API_URL", "http://localhost:11434")
-        self.model = model
+        self.base_url = base_url or os.getenv("OLLAMA_API_URL", "http://host.docker.internal:11434")
+        self.model = model = os.getenv("OLLAMA_MODEL", "qwen2.5:3b-instruct")
         self.timeout = timeout
         self.chat_endpoint = f"{self.base_url}/api/chat"
     
@@ -149,63 +155,96 @@ class OllamaClient:
         similar_context: str,
         cpv: Optional[str]
     ) -> str:
-        """Create the analysis prompt with rubric priorities."""
+        """Create a compact, strict analysis prompt for Ollama."""
         cpv_text = f"\nCPV Code: {cpv}" if cpv else ""
-        
-        return f"""You are an expert in public procurement analysis. Analyze the following procurement draft and provide a detailed analysis.
 
-PROCUREMENT DRAFT:
-Title: {title}
-Description: {description}{cpv_text}
+        return f"""You are analyzing a draft public procurement notice for a prototype decision-support system.
 
-SIMILAR PAST NOTICES:
-{similar_context}
+    Use ONLY the draft and the provided similar notices.
+    Do NOT invent facts, outcomes, supplier behavior, delays, or budget overruns unless they are clearly stated in the provided text.
+    If information is missing, state that briefly in caveats.
 
-RUBRIC PRIORITIES:
-When analyzing this procurement draft, prioritize the following dimensions:
-1. Risk Management: Assess potential risks, mitigation strategies, and contract safeguards
-2. Sustainability & Social Values: Evaluate environmental impact, social responsibility, and ethical considerations
-3. Transparency & Fair Competition: Analyze clarity of requirements, accessibility to bidders, and fairness
-4. Innovation & Forward-Thinking: Evaluate modern approaches, technological advancement, and future-readiness
+    PROCUREMENT DRAFT
+    Title: {title}
+    Description: {description}{cpv_text}
 
-Please provide a comprehensive analysis in JSON format ONLY. Do not include any text before or after the JSON.
+    SIMILAR NOTICES
+    {similar_context}
 
-Your response must be valid JSON matching this exact structure:
-{{
-  "similar_notices_ranked": [
+    TASK
+    Compare the draft to the similar notices and produce a structured analysis.
+
+    ANALYSIS RULES
+    - Base the analysis only on the provided text.
+    - Keep overlap_summary to 3-5 sentences.
+    - Keep each qualitative_analysis field to 2-3 sentences.
+    - Keep recommendation.rationale to 2-3 sentences.
+    - Keep caveats to 1-3 short sentences.
+    - confidence must be a number between 0.0 and 1.0.
+    - recommendation.decision must be exactly one of:
+    "approve", "revise", "reject"
+    - similar_notices_ranked should include the most relevant retrieved notices first.
+    - Preserve notice_id and score values from the retrieved notices when possible.
+    - Return ONLY valid JSON.
+
+    QUALITATIVE PRIORITIES
+    1. Risk Management:
+    Assess implementation risk, complexity, dependency risk, unclear scope, integration risk, and contract safeguards.
+    2. Sustainability & Social Values:
+    Assess whether the draft mentions environmental, social, or ethical considerations.
+    3. Transparency & Fair Competition:
+    Assess whether the scope and requirements appear clear, fair, and accessible to multiple bidders.
+    4. Innovation & Forward-Thinking:
+    Assess whether the draft appears modern, future-ready, and open to appropriate technological development.
+
+    REQUIRED JSON SCHEMA
     {{
-      "notice_id": "string",
-      "score": 0.0,
-      "title": "string or null",
-      "buyer": "string or null",
-      "cpv_codes": ["string"] or null,
-      "published_date": "string or null"
+    "similar_notices_ranked": [
+        {{
+        "notice_id": "string",
+        "score": 0.0,
+        "title": "string or null",
+        "buyer": "string or null",
+        "cpv_codes": ["string"] or null,
+        "published_date": "string or null"
+        }}
+    ],
+    "overlap_summary": "string",
+    "qualitative_analysis": {{
+        "risk_management": "string",
+        "sustainability_social_values": "string",
+        "transparency_fair_competition": "string",
+        "innovation_forward_thinking": "string"
+    }},
+    "recommendation": {{
+        "decision": "approve | revise | reject",
+        "rationale": "string"
+    }},
+    "confidence": 0.0,
+    "caveats": "string"
     }}
-  ],
-  "overlap_summary": "string - summarize key overlaps and differences with similar notices",
-  "qualitative_analysis": {{
-    "risk_management": "string - assess risk management aspects",
-    "sustainability_social_values": "string - evaluate sustainability and social value considerations",
-    "transparency_fair_competition": "string - analyze transparency and fair competition elements",
-    "innovation_forward_thinking": "string - evaluate innovation and forward-thinking aspects"
-  }},
-  "recommendation": {{
-    "decision": "string - one of: approve, revise, reject",
-    "rationale": "string - explain the reasoning behind the decision"
-  }},
-  "confidence": 0.0,
-  "caveats": "string - list any limitations, assumptions, or caveats"
-}}
 
-Return ONLY valid JSON, no other text."""
+    Every top-level field in the JSON schema is required. If information is limited, still include the field and keep the value brief.
+    Do not omit caveats.
+
+    Return ONLY the JSON object. No markdown. No code block. No extra commentary."""
     
     def _create_strict_json_prompt(self, original_prompt: str) -> str:
-        """Create a stricter version of the prompt emphasizing JSON-only output."""
+        """Create a stricter retry prompt for JSON-only output."""
         return f"""{original_prompt}
 
-CRITICAL: Your response must be ONLY valid JSON. No markdown, no code blocks, no explanations.
-Start your response with {{ and end with }}.
-Ensure all strings are properly quoted and all JSON syntax is correct."""
+    CRITICAL JSON RETRY INSTRUCTIONS:
+    - Return ONLY one valid JSON object.
+    - Do NOT use markdown or code fences.
+    - Do NOT include explanations before or after the JSON.
+    - All keys and string values must use double quotes.
+    - confidence must be a numeric value between 0.0 and 1.0.
+    - recommendation.decision must be exactly "approve", "revise", or "reject".
+    - If information is missing, keep the field brief rather than inventing facts.
+
+    Do not omit any required field. If uncertain, use a short string instead of leaving fields out.
+
+    Return ONLY valid JSON."""
     
     async def _call_ollama(self, prompt: str) -> str:
         """
@@ -227,14 +266,23 @@ Ensure all strings are properly quoted and all JSON syntax is correct."""
                     }
                 ],
                 "stream": False,
-                "format": "json"  # Request JSON format from Ollama
+                "format": "json",  # Request JSON format from Ollama
+                "options": {
+                    "temperature": 0,
+                    "num_predict": 800
+                }
             }
-            
+            start = time.monotonic()
+            logger.info(f"Calling Ollama at {self.chat_endpoint} with model {self.model}")
+
             response = await client.post(
                 self.chat_endpoint,
                 json=request_data
             )
             response.raise_for_status()
+
+            elapsed = time.monotonic() - start
+            logger.info(f"Ollama responded in {elapsed:.2f} seconds")
             
             result = response.json()
             
@@ -274,6 +322,9 @@ Ensure all strings are properly quoted and all JSON syntax is correct."""
         
         # Parse JSON
         data = json.loads(response_text)
+
+        if "caveats" not in data:
+            data["caveats"] = ""
         
         # Validate and return
         return AnalysisResult(**data)
@@ -285,7 +336,7 @@ async def analyze_draft_with_llm(
     similar_notices: List[dict],
     cpv: Optional[str] = None,
     ollama_url: Optional[str] = None,
-    model: str = "llama3.2"
+    model: str = "qwen2.5:3b-instruct"
 ) -> AnalysisResult:
     """
     Convenience function to analyze a draft with LLM.

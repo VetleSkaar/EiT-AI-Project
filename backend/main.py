@@ -183,7 +183,7 @@ async def analyze_draft(draft_id: int):
     similarities = cosine_similarity(draft_vector, tfidf_matrix)[0]
     
     # Get top 10 similar notices
-    top_k = 10
+    top_k = 5
     top_indices = np.argsort(similarities)[::-1][:top_k]
     
     # Build response with top notices
@@ -207,7 +207,7 @@ async def analyze_draft(draft_id: int):
             similar_notices=retrieved_notices,
             cpv=draft.get('cpv'),
             ollama_url=os.getenv("OLLAMA_API_URL"),
-            model=os.getenv("OLLAMA_MODEL", "llama3.2")
+            model=os.getenv("OLLAMA_MODEL", "qwen2.5:3b-instruct")
         )
         
         # Convert the AnalysisResult to dict for storage
