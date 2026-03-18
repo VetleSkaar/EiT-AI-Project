@@ -3,13 +3,18 @@ services:
     build: ./backend
     ports:
       - "8000:8000"
+    environment:
+      # Point to Ollama running on the host machine.
+      # host.docker.internal resolves to the host on macOS/Windows automatically;
+      # the extra_hosts entry below makes it work on Linux as well.
+      - OLLAMA_API_URL=http://host.docker.internal:11434
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     env_file:
       - path: ./backend/.env
         required: false
     volumes:
       - ./backend:/app
-    depends_on:
-      - ollama
 
   frontend:
     build: ./frontend
@@ -25,13 +30,3 @@ services:
       - /app/node_modules
     depends_on:
       - backend
-
-  ollama:
-    image: ollama/ollama
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama_data:/root/.ollama
-
-volumes:
-  ollama_data:
